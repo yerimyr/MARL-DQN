@@ -99,6 +99,20 @@ class GymWrapper:
             if len(self.buffer) >= self.batch_size:
                 self.dqn.update(self.batch_size)
 
+            # 각 에피소드가 끝날 때마다 Replay Buffer의 크기를 tensorboard에 기록.
+            self.logger.log_replay_buffer_size(episode, len(self.buffer))
+
+             # 에이전트별 액션 로그 추가
+            self.logger.log_agent_actions(episode, actions)
+            
+            # 기존 로그 기능 유지
+            avg_cost = -episode_reward / self.env.current_day
+            self.logger.log_training_info(episode, episode_reward, avg_cost, info['inventory_levels'], epsilon)
+
+            # eval_interval마다 현재 학습 상태를 콘솔에 출력.
+            if episode % eval_interval == 0:
+                print(f"Replay Buffer Size: {len(self.buffer)}")
+                
             # Log training information
             avg_cost = -episode_reward/self.env.current_day
             self.logger.log_training_info(

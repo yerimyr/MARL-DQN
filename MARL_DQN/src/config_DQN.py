@@ -31,7 +31,7 @@ for key in P:
 N_TRAIN_EPISODES: Number of training episodes (Default=1000)
 EVAL_INTERVAL: Interval for evaluation and printing results (Default=10)
 '''
-N_TRAIN_EPISODES = 10000
+N_TRAIN_EPISODES = 5000
 EVAL_INTERVAL = 10
 
 # Evaluation

@@ -108,18 +108,27 @@ class TensorboardLogger:
         # Also log as hparams for the experiment comparison interface
         self.writer.add_hparams(config_dict, {'hparam/dummy_metric': 0})
     
+    # validation
+    def log_replay_buffer_size(self, episode, buffer_size):
+        """
+        Replay Buffer 크기를 TensorBoard에 기록
+        Args:
+            episode (int): 현재 에피소드
+            buffer_size (int): Replay Buffer 크기
+        """
+        self.writer.add_scalar('Training/Replay_Buffer_Size', buffer_size, episode)
+    
+    # validation
+    def log_agent_actions(self, episode, actions):
+        """
+        각 에이전트의 액션 선택을 TensorBoard에 기록
+        Args:
+            episode (int): 현재 에피소드
+            actions (list): 각 에이전트가 선택한 액션 리스트
+        """
+        for agent_id, action in enumerate(actions):
+            self.writer.add_scalar(f'Agent_Actions/Agent_{agent_id+1}', action, episode)
     
     def close(self):
         """Close the tensorboard writer"""
         self.writer.close()
-
-    '''
-    def log_buffer_size(self, buffer_size, episode):
-        """
-        Log the size of the replay buffer.
-        Args:
-            buffer_size (int): The number of transitions currently stored in the buffer
-            episode (int): The current training episode
-        """
-        self.writer.add_scalar('ReplayBuffer/Size', buffer_size, episode)
-    '''
