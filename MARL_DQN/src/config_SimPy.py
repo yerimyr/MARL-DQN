@@ -182,7 +182,7 @@ MAT_COUNT = 0
 for id in I.keys():
     if I[id]["TYPE"] == "Material":
         MAT_COUNT += 1
-
+"""
 # Scenario about Demand and leadtime
 DEMAND_SCENARIO = {"Dist_Type": "UNIFORM",
                    "min": 10,
@@ -200,7 +200,7 @@ DEMAND_SCENARIO = {"Dist_Type": "GAUSSIAN",
 LEADTIME_SCENARIO = {"Dist_Type": "GAUSSIAN",
                      "mean": 3,
                      "std": 1}
-"""
+
 
 
 def DEFINE_FOLDER(folder_name):

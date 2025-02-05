@@ -112,3 +112,14 @@ class TensorboardLogger:
     def close(self):
         """Close the tensorboard writer"""
         self.writer.close()
+
+    '''
+    def log_buffer_size(self, buffer_size, episode):
+        """
+        Log the size of the replay buffer.
+        Args:
+            buffer_size (int): The number of transitions currently stored in the buffer
+            episode (int): The current training episode
+        """
+        self.writer.add_scalar('ReplayBuffer/Size', buffer_size, episode)
+    '''
