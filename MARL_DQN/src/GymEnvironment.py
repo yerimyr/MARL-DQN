@@ -39,7 +39,7 @@ class InventoryManagementEnv(gym.Env):
         action_dims = []
         for i in range(len(I)):
             if I[i]["TYPE"] == "Material":
-                action_dims.append(ACTION_MAX)
+                action_dims.append(ACTION_MAX-ACTION_MIN+1)
         self.action_space = spaces.MultiDiscrete(action_dims)
 
         # Define unified observation space

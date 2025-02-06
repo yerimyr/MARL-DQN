@@ -110,14 +110,16 @@ class MultiAgentDQN:
         Returns:
             action: Selected action
         """
+        state_tensor = torch.FloatTensor(state).unsqueeze(0)
+        with torch.no_grad():
+            q_values = self.q_network(state_tensor)
+            action = torch.argmax(q_values).item()
+            action_q_value = q_values[0, action].item()  # 선택한 action의 Q-value 저장
+
         if random.random() < epsilon:
-            return np.random.randint(0, self.action_dim)
+            return np.random.randint(0, self.action_dim), None  # 랜덤 선택 시 Q-value 기록 안 함
         else:
-            state_tensor = torch.FloatTensor(state).unsqueeze(0)
-            with torch.no_grad():
-                q_values = self.q_network(state_tensor)
-                action = torch.argmax(q_values).item()
-            return action
+            return action, action_q_value  # 선택한 action과 Q-value 반환
 
     def update(self, batch_size):
         """
@@ -131,7 +133,7 @@ class MultiAgentDQN:
         else:
             # Sample batch
             states, actions, rewards, next_states, dones = self.replay_buffer.sample(batch_size)
-
+            
             # Convert to tensors
             states = states
             actions = actions.unsqueeze(-1)
