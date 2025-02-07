@@ -120,15 +120,11 @@ class TensorboardLogger:
         self.writer.add_scalar('Training/Replay_Buffer_Size', buffer_size, episode)
         
     # validation
-    def log_agent_action_distribution(self, episode, agent_actions):
+    def log_agent_action(self, episode, agent_actions):
         """
-        각 에이전트별 선택한 Action 분포를 TensorBoard에 기록 (히스토그램 사용)
-        Args:
-            episode (int): 현재 에피소드
-            agent_actions (list): 각 에이전트가 선택한 액션 리스트 (길이: n_agents)
+        각 에이전트가 선택한 Action을 즉시 출력하여 확인
         """
-        for agent_id, action in enumerate(agent_actions):
-            self.writer.add_histogram(f'Agent_Actions/Agent_{agent_id+1}', action, episode, bins=6)
+        print(f"Episode {episode}: Agent Actions - {agent_actions}")
  
             
     # validation

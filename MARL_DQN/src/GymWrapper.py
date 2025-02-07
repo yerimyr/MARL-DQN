@@ -69,7 +69,6 @@ class GymWrapper:
         """
         best_reward = float('-inf')  # best_reward 변수 초기화. 
         action_history = {i: [] for i in range(self.n_agents)}  # agent별 action 저장
-        q_value_history = {i: [] for i in range(self.n_agents)}  # agent별 Q-value 저장
          
         for episode in range(episodes):
             states = self.env.reset()
@@ -83,7 +82,7 @@ class GymWrapper:
                 actions = []
                 step_q_values = []  # 각 step에서 agent별 Q-value 저장
                 for i in range(self.n_agents):
-                    action, q_value = self.dqn.select_action(states[i], epsilon)  # action과 Q-value 반환
+                    action, q_value = self.dqn.select_action(states[i], epsilon)  # action과 Q-value 반환 # 각 에이전트가 자신의 state만 참고하여 action을 선택함.
                     actions.append(action)
                     action_history[i].append((episode, action))
                     if q_value is not None:
@@ -111,7 +110,7 @@ class GymWrapper:
             if len(self.buffer) >= self.batch_size:
                 self.dqn.update(self.batch_size)
             
-            self.logger.log_agent_action_distribution(episode, actions)
+            self.logger.log_agent_action(episode, actions)
             
             # Q-value TensorBoard에 기록 
             avg_q_value = np.mean(q_values) if q_values else 0

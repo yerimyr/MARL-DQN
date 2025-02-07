@@ -142,7 +142,7 @@ class MultiAgentDQN:
             dones = dones.unsqueeze(-1)
 
             # Q-values for current states
-            q_values = self.q_network(states).gather(1, actions)
+            q_values = self.q_network(states).gather(1, actions)  # self.q_network(states)는 (3, action_dim) 크기의 Q-값 행렬을 반환 / .gather(1, actions)를 통해, 각 에이전트가 선택한 행동에 해당하는 Q-값만 가져옴.
 
             # Target Q-values for next states
             with torch.no_grad():
@@ -153,7 +153,7 @@ class MultiAgentDQN:
             #loss = nn.MSELoss()(q_values, target_q_values)
             loss = nn.SmoothL1Loss()(q_values, target_q_values)
             self.optimizer.zero_grad()
-            loss.backward()
+            loss.backward()  # pytorch에서는 loss값이 여러 개여도 각 loss값들을 합산하여 평균내서 한 번의 업데이트를 진행함.
             self.optimizer.step()
 
             # Increment update step
