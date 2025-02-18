@@ -114,12 +114,11 @@ class MultiAgentDQN:
         with torch.no_grad():
             q_values = self.q_network(state_tensor)
             action = torch.argmax(q_values).item()
-            action_q_value = q_values[0, action].item()  # 선택한 action의 Q-value 저장
 
         if random.random() < epsilon:
-            return np.random.randint(0, self.action_dim), None  # 랜덤 선택 시 Q-value 기록 안 함
+            return np.random.randint(0, self.action_dim)
         else:
-            return action, action_q_value  # 선택한 action과 Q-value 반환
+            return action
 
     def update(self, batch_size):
         """

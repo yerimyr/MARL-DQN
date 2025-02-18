@@ -21,10 +21,6 @@ class InventoryManagementEnv(gym.Env):
         self.shortages = 0
         self.total_reward_over_episode = []
         self.total_reward = 0
-        #self.cur_episode = 1  # Current episode
-        #self.cur_outer_loop = 1  # Current outer loop
-        #self.cur_inner_loop = 1  # Current inner loop
-        #self.scenario_batch_size = 99999  # Initialize the scenario batch size
         self.current_day = 0  # Initialize the current day
         self.n_agents = MAT_COUNT  # Number of agents
 
@@ -51,7 +47,8 @@ class InventoryManagementEnv(gym.Env):
         for _ in range(MAT_COUNT):
             obs_dims.append(ACTION_MAX - ACTION_MIN + 1)
         # Remaining demand
-        obs_dims.append(ACTION_MAX - ACTION_MIN + 1)
+        #obs_dims.append(ACTION_MAX - ACTION_MIN + 1)
+        obs_dims.append(max(I[0]['DEMAND_QUANTITY'], INVEN_LEVEL_MAX) - INVEN_LEVEL_MIN + 1)  ##########250218##########
         # Define observation space as MultiDiscrete
         self.observation_space = spaces.MultiDiscrete(obs_dims)
 
@@ -156,7 +153,7 @@ class InventoryManagementEnv(gym.Env):
         """
         # Initialize single state array
         state = np.zeros(STATE_DIM, dtype=np.int32)  # np.zeros: 모든 값을 0으로 초기화
-        state_idx = 0  # 상태 배열의 특정 인덱스를 추적하는 데 사용됨.
+        state_idx = 0  # 상태 배열의 특정 인덱스를 추적하는 데 사용
 
         # Add on-hand inventory levels for all items
         for inv in self.inventory_list:
@@ -177,18 +174,18 @@ class InventoryManagementEnv(gym.Env):
                 )
                 state_idx += 1
 
-        # Add remaining demand
+        # Add remaining demand      
         remaining_demand = I[0]['DEMAND_QUANTITY'] - \
             self.inventory_list[0].on_hand_inventory
         state[state_idx] = np.clip(
             remaining_demand,
-            ACTION_MIN,
-            ACTION_MAX
+            0,
+            max(I[0]['DEMAND_QUANTITY'], INVEN_LEVEL_MAX)  ##########250218##########
         )
 
         # Copy the same state for all agents
         states = np.tile(state, (self.n_agents, 1))  # state 배열을 agent 수만큼 복제하여, 각 agent가 동일한 상태를 관찰할 수 있게함.
-
+        
         return states
 
     def render(self, mode='human'):

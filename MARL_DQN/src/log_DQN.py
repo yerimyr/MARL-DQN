@@ -73,7 +73,7 @@ class TensorboardLogger:
         
         
     
-    def log_evaluation_info(self, episode, total_reward, avg_daily_cost, inventory_levels):  # 평가 중 데이터 기록록
+    def log_evaluation_info(self, episode, total_reward, avg_daily_cost, inventory_levels):  # 평가 중 데이터 기록
         """
         Log evaluation metrics to tensorboard
 
@@ -125,16 +125,7 @@ class TensorboardLogger:
         각 에이전트가 선택한 Action을 즉시 출력하여 확인
         """
         print(f"Episode {episode}: Agent Actions - {agent_actions}")
- 
-            
-    # validation
-    def log_q_values(self, episode, avg_q_values):
-        """
-        선택한 action의 Q-value를 TensorBoard에 기록
-        """
-        for agent_id, q_value in enumerate(avg_q_values):
-            if q_value is not None:  # Q-value가 존재하는 경우만 기록
-                self.writer.add_scalar(f'Q_Values/Agent_{agent_id+1}', q_value, episode)
+
 
     def close(self):
         """Close the tensorboard writer"""
