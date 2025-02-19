@@ -28,7 +28,6 @@ if LOAD_MODEL:
     try:
         wrapper.load_model(MODEL_PATH)
         print("Model loaded successfully")
-
         # Evaluate the loaded model
         training_end_time = time.time()
         wrapper.evaluate(N_EVAL_EPISODES)

@@ -29,19 +29,21 @@ class GymWrapper:
         self.state_dim = state_dim
         self.batch_size = batch_size
 
-        # Initialize MARL_DQN components with correct parameter order
-        self.dqn = MultiAgentDQN(
-            n_agents=n_agents,
-            state_dim=state_dim,
-            action_dim=action_dim,
-            lr=lr,
-            gamma=gamma
-        )
         self.buffer = ReplayBuffer(
             capacity=buffer_size,
             state_dim=state_dim,
             action_dim=action_dim,
             n_agents=n_agents
+        )
+        
+        # Initialize MARL_DQN components with correct parameter order
+        self.dqn = MultiAgentDQN(
+            n_agents=n_agents,
+            state_dim=state_dim,
+            action_dim=action_dim,
+            buffer=self.buffer,
+            lr=lr,
+            gamma=gamma
         )
 
         # Initialize tensorboard logger
@@ -102,8 +104,8 @@ class GymWrapper:
             if len(self.buffer) >= self.batch_size:
                 self.dqn.update(self.batch_size)
             
-            self.logger.log_agent_action(episode, actions)
-
+            #self.logger.log_agent_action(episode, actions)
+            
             self.logger.log_training_info(
                 episode, episode_reward, -episode_reward/self.env.current_day, info['inventory_levels'], epsilon
             )

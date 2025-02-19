@@ -5,14 +5,15 @@ import torch.nn.functional as F
 import numpy as np
 import random
 from collections import deque
+from log_DQN import TensorboardLogger
 
 class DQN(nn.Module):
     
     def __init__(self, state_dim, action_dim):
         super(DQN, self).__init__()
-        self.fc1 = nn.Linear(state_dim, 128)
-        self.fc2 = nn.Linear(128, 128)
-        self.fc3 = nn.Linear(128, action_dim)  # Outputs Q-values for all actions
+        self.fc1 = nn.Linear(state_dim, 64)
+        self.fc2 = nn.Linear(64, 64)
+        self.fc3 = nn.Linear(64, action_dim)  # Outputs Q-values for all actions
 
     def forward(self, x):
         x = torch.relu(self.fc1(x))
@@ -75,11 +76,13 @@ class MultiAgentDQN:
         lr (float): Learning rate
         gamma (float): Discount factor
     """
-    def __init__(self, n_agents, state_dim, action_dim, lr=1e-3, t_target_interval=5000, gamma=0.99):
+    def __init__(self, buffer, n_agents, state_dim, action_dim, lr=1e-3, t_target_interval=5000, gamma=0.99):
+        self.buffer = buffer
         self.n_agents = n_agents
         self.state_dim = state_dim
         self.action_dim = action_dim
-        self.target_network = t_target_interval
+        self.t_target_interval = t_target_interval
+        self.update_step = 1
         self.gamma = gamma
 
         # Initialize Q-network and target network
@@ -90,14 +93,9 @@ class MultiAgentDQN:
 
         # Optimizer
         self.optimizer = optim.Adam(self.q_network.parameters(), lr=lr)
-
-        # Replay buffer
-        self.replay_buffer = ReplayBuffer(
-            capacity=10000,
-            state_dim=state_dim,
-            action_dim=action_dim,
-            n_agents=n_agents
-        )
+        
+        # Loss Logger
+        self.logger = TensorboardLogger(n_agents=n_agents)
 
     def select_action(self, state, epsilon=0.1):
         """
@@ -114,24 +112,24 @@ class MultiAgentDQN:
         with torch.no_grad():
             q_values = self.q_network(state_tensor)
             action = torch.argmax(q_values).item()
-
+   
         if random.random() < epsilon:
             return np.random.randint(0, self.action_dim)
         else:
             return action
 
-    def update(self, batch_size):
+    def update(self, batch_size): 
         """
         Update Q-network using sampled transitions from replay buffer.
 
         Args:
             batch_size (int): Number of samples to update from
         """
-        if len(self.replay_buffer) < batch_size:
+        if len(self.buffer) < batch_size:
             return
         else:
             # Sample batch
-            states, actions, rewards, next_states, dones = self.replay_buffer.sample(batch_size)
+            states, actions, rewards, next_states, dones = self.buffer.sample(batch_size)
             
             # Convert to tensors
             states = states
@@ -141,22 +139,25 @@ class MultiAgentDQN:
             dones = dones.unsqueeze(-1)
 
             # Q-values for current states
-            q_values = self.q_network(states).gather(1, actions)  # self.q_network(states)는 (3, action_dim) 크기의 Q-값 행렬을 반환 / .gather(1, actions)를 통해, 각 에이전트가 선택한 행동에 해당하는 Q-값만 가져옴.
-
+            q_values = self.q_network(states).gather(2, actions)  # self.q_network(states)는 (3, action_dim) 크기의 Q-값 행렬을 반환 / .gather(1, actions)를 통해, 각 에이전트가 선택한 행동에 해당하는 Q-값만 가져옴  
             # Target Q-values for next states
             with torch.no_grad():
-                next_q_values = self.target_network(next_states).max(dim=1)[0]
+                next_q_values = self.target_network(next_states).max(dim=2)[0]
                 target_q_values = rewards + (1 - dones) * self.gamma * next_q_values
+                target_q_values = target_q_values.unsqueeze(-1)
 
             # Compute loss and update network
             #loss = nn.MSELoss()(q_values, target_q_values)
-            loss = nn.SmoothL1Loss()(q_values, target_q_values)
+            loss = nn.SmoothL1Loss()(q_values, target_q_values) 
             self.optimizer.zero_grad()
-            loss.backward()  # pytorch에서는 loss값이 여러 개여도 각 loss값들을 합산하여 평균내서 한 번의 업데이트를 진행함.
+            loss.backward()  # pytorch에서는 loss값이 여러 개여도 각 loss값들을 합산하여 평균내서 한 번의 업데이트를 진행함.   
             self.optimizer.step()
-
+            
             # Increment update step
             self.update_step += 1
+            
+            # Loss Logger
+            self.logger.log_loss(loss.item(), self.update_step)
 
             # Update target network periodically
             if self.update_step % self.t_target_interval == 0:

@@ -2,6 +2,7 @@ from torch.utils.tensorboard import SummaryWriter
 import os
 import numpy as np
 from datetime import datetime
+from collections import deque
 from config_DQN import *
 
 
@@ -37,6 +38,7 @@ class TensorboardLogger:
         self.log_dir = os.path.join(log_dir, run_name)
         self.writer = SummaryWriter(self.log_dir)
         self.n_agents = n_agents
+        self.loss_window = deque(maxlen=100)
 
         print(f"Tensorboard logging to {self.log_dir}")
         print("To view training progress, run:")
@@ -119,14 +121,22 @@ class TensorboardLogger:
         """
         self.writer.add_scalar('Training/Replay_Buffer_Size', buffer_size, episode)
         
+    '''  
     # validation
     def log_agent_action(self, episode, agent_actions):
         """
         각 에이전트가 선택한 Action을 즉시 출력하여 확인
         """
         print(f"Episode {episode}: Agent Actions - {agent_actions}")
+    '''
 
-
+    # validation
+    def log_loss(self, loss, step):
+        """Loss 값을 moving average 적용하여 100step의 평균 loss값을 기록"""
+        self.loss_window.append(loss)  
+        smoothed_loss = sum(self.loss_window) / len(self.loss_window)  
+        self.writer.add_scalar("Loss/train", smoothed_loss, step)  
+        
     def close(self):
         """Close the tensorboard writer"""
         self.writer.close()

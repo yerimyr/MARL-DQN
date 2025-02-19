@@ -14,7 +14,7 @@ Remaining demand: 1
 STATE_DIM = len(I) + MAT_COUNT + 1
 
 
-BUFFER_SIZE = 1000000
+BUFFER_SIZE = 100000
 BATCH_SIZE = 32  # Batch size for training (unit: episodes)
 LEARNING_RATE = 0.00001
 GAMMA = 0.99
