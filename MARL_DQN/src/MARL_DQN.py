@@ -125,7 +125,7 @@ class MultiAgentDQN:
         Args:
             batch_size (int): Number of samples to update from
         """
-        if len(self.buffer) < batch_size:
+        if len(self.buffer) < batch_size:  # replay buffer에 충분한 transition이 쌓이기 전까지는 update()함수가 수행되지 않음.
             return
         else:
             # Sample batch
@@ -139,7 +139,7 @@ class MultiAgentDQN:
             dones = dones.unsqueeze(-1)
 
             # Q-values for current states
-            q_values = self.q_network(states).gather(2, actions)  # self.q_network(states)는 (3, action_dim) 크기의 Q-값 행렬을 반환 / .gather(1, actions)를 통해, 각 에이전트가 선택한 행동에 해당하는 Q-값만 가져옴  
+            q_values = self.q_network(states).gather(2, actions) 
             # Target Q-values for next states
             with torch.no_grad():
                 next_q_values = self.target_network(next_states).max(dim=2)[0]

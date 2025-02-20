@@ -69,7 +69,7 @@ class GymWrapper:
             episodes: Number of training episodes
             eval_interval: Interval for evaluation and printing results
         """
-        best_reward = float('-inf')  # best_reward 변수 초기화. 
+        best_reward = float('-inf')  
         action_history = {i: [] for i in range(self.n_agents)}  # agent별 action 저장
          
         for episode in range(episodes):
@@ -82,12 +82,12 @@ class GymWrapper:
                 # Select actions for each agent
                 actions = []
                 for i in range(self.n_agents):
-                    action = self.dqn.select_action(states[i], epsilon)  # action 반환 # 각 에이전트가 자신의 state만 참고하여 action을 선택함.
+                    action = self.dqn.select_action(states[i], epsilon)  # 각 에이전트가 자신의 state만 참고하여 action을 선택함. (Centralized Execution)
                     actions.append(action)
                     action_history[i].append((episode, action))
 
                 # Execute actions in environment
-                next_states, reward, done, info = self.env.step(actions)  # 선택된 행동들을 환경에 전달하여 얻는 정보들.
+                next_states, reward, done, info = self.env.step(actions)  
 
                 # Store transition in buffer
                 self.buffer.push(states, np.array(actions),
@@ -112,10 +112,6 @@ class GymWrapper:
 
             # 각 에피소드가 끝날 때마다 Replay Buffer의 크기를 tensorboard에 기록.
             self.logger.log_replay_buffer_size(episode, len(self.buffer))
-            
-            # 기존 로그 기능 유지
-            avg_cost = -episode_reward / self.env.current_day
-            self.logger.log_training_info(episode, episode_reward, avg_cost, info['inventory_levels'], epsilon)
                 
             # Log training information
             avg_cost = -episode_reward/self.env.current_day

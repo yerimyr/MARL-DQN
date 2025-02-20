@@ -45,7 +45,7 @@ class TensorboardLogger:
         print(f"tensorboard --logdir={log_dir}")
 
     def log_training_info(self, episode, episode_reward, avg_cost, inventory_levels,
-                          epsilon=None):  # 학습 중 에피소드 단위로 데이터(reward, avg_cost, inventory_levels, epsilon) 기록
+                          epsilon=None): 
         """
         Log training metrics to tensorboard
 
@@ -75,7 +75,7 @@ class TensorboardLogger:
         
         
     
-    def log_evaluation_info(self, episode, total_reward, avg_daily_cost, inventory_levels):  # 평가 중 데이터 기록
+    def log_evaluation_info(self, episode, total_reward, avg_daily_cost, inventory_levels):
         """
         Log evaluation metrics to tensorboard
 
@@ -96,7 +96,7 @@ class TensorboardLogger:
                                    level, episode)
             
     
-    def log_hyperparameters(self, config_dict):  # 하이퍼파라미터 설정 정보 기록
+    def log_hyperparameters(self, config_dict): 
         """
         Log hyperparameters to tensorboard
 

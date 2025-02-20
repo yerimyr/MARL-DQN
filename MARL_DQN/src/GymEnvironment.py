@@ -45,11 +45,9 @@ class InventoryManagementEnv(gym.Env):
             obs_dims.append(INVEN_LEVEL_MAX - INVEN_LEVEL_MIN + 1)
         # In-transition inventory levels for material items
         for _ in range(MAT_COUNT):
-            #obs_dims.append(ACTION_MAX-ACTION_MIN+1)
             obs_dims.append(INVEN_LEVEL_MAX - INVEN_LEVEL_MIN + 1)
         # Remaining demand
-        #obs_dims.append(ACTION_MAX - ACTION_MIN + 1)
-        obs_dims.append(MAX_DEMAND - INVEN_LEVEL_MIN + 1) 
+        obs_dims.append(INVEN_LEVEL_MAX - INVEN_LEVEL_MIN + 1) 
         # Define observation space as MultiDiscrete
         self.observation_space = spaces.MultiDiscrete(obs_dims)
 
@@ -118,7 +116,7 @@ class InventoryManagementEnv(gym.Env):
         next_states = self._get_observations()
 
         # Calculate reward (a negative value of the daily total cost)
-        reward = -Cost.update_cost_log(self.inventory_list) / 10000
+        reward = -Cost.update_cost_log(self.inventory_list) / 10000  # reward scaling
         # Update LOG_TOTAL_COST_COMP
         for key in DAILY_COST.keys():
             LOG_TOTAL_COST_COMP[key] += DAILY_COST[key]
@@ -181,11 +179,11 @@ class InventoryManagementEnv(gym.Env):
         state[state_idx] = np.clip(
             remaining_demand,
             0,
-            MAX_DEMAND
+            INVEN_LEVEL_MIN
         )
 
         # Copy the same state for all agents
-        states = np.tile(state, (self.n_agents, 1))  # state 배열을 agent 수만큼 복제하여, 각 agent가 동일한 상태를 관찰할 수 있게함.
+        states = np.tile(state, (self.n_agents, 1))  # state 배열을 agent 수만큼 복제하여, 각 agent가 동일한 상태를 관찰할 수 있게함. (Centralized Execution)
         
         return states
 

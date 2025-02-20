@@ -183,9 +183,6 @@ for mat_id in I.keys():
     if I[mat_id]["TYPE"] == "Material":
         MAT_COUNT += 1
 
-# Maximum Demand quantity
-MAX_DEMAND = 20  # Ensure that DEMAND_SCENARIO["max"] does not exceed MAX_DEMAND
-
 # Scenario about Demand and leadtime
 DEMAND_SCENARIO = {"Dist_Type": "UNIFORM",
                    "min": 10,
@@ -228,7 +225,13 @@ def save_path(path):
 def DEMAND_QTY_FUNC(scenario):
     # Uniform distribution
     if scenario["Dist_Type"] == "UNIFORM":
-        return random.randint(scenario['min'], scenario["max"])
+        demand = random.randint(scenario['min'], scenario["max"])
+        if demand < 0:
+            return 1
+        elif demand > INVEN_LEVEL_MAX:
+            return INVEN_LEVEL_MAX
+        else:
+            return demand
     # Gaussian distribution
     elif scenario["Dist_Type"] == "GAUSSIAN":
         # Gaussian distribution
