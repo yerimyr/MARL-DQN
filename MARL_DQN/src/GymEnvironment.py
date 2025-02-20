@@ -45,10 +45,11 @@ class InventoryManagementEnv(gym.Env):
             obs_dims.append(INVEN_LEVEL_MAX - INVEN_LEVEL_MIN + 1)
         # In-transition inventory levels for material items
         for _ in range(MAT_COUNT):
-            obs_dims.append(ACTION_MAX - ACTION_MIN + 1)
+            #obs_dims.append(ACTION_MAX-ACTION_MIN+1)
+            obs_dims.append(INVEN_LEVEL_MAX - INVEN_LEVEL_MIN + 1)
         # Remaining demand
         #obs_dims.append(ACTION_MAX - ACTION_MIN + 1)
-        obs_dims.append(max(I[0]['DEMAND_QUANTITY'], INVEN_LEVEL_MAX) - INVEN_LEVEL_MIN + 1)  ##########250218##########
+        obs_dims.append(MAX_DEMAND - INVEN_LEVEL_MIN + 1) 
         # Define observation space as MultiDiscrete
         self.observation_space = spaces.MultiDiscrete(obs_dims)
 
@@ -169,8 +170,8 @@ class InventoryManagementEnv(gym.Env):
             if I[inv.item_id]["TYPE"] == "Material":
                 state[state_idx] = np.clip(
                     inv.in_transition_inventory,
-                    ACTION_MIN,
-                    ACTION_MAX
+                    INVEN_LEVEL_MIN,
+                    INVEN_LEVEL_MAX
                 )
                 state_idx += 1
 
@@ -180,7 +181,7 @@ class InventoryManagementEnv(gym.Env):
         state[state_idx] = np.clip(
             remaining_demand,
             0,
-            max(I[0]['DEMAND_QUANTITY'], INVEN_LEVEL_MAX)  ##########250218##########
+            MAX_DEMAND
         )
 
         # Copy the same state for all agents

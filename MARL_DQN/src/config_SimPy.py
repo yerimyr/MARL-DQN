@@ -183,6 +183,9 @@ for mat_id in I.keys():
     if I[mat_id]["TYPE"] == "Material":
         MAT_COUNT += 1
 
+# Maximum Demand quantity
+MAX_DEMAND = 20  # Ensure that DEMAND_SCENARIO["max"] does not exceed MAX_DEMAND
+
 # Scenario about Demand and leadtime
 DEMAND_SCENARIO = {"Dist_Type": "UNIFORM",
                    "min": 10,

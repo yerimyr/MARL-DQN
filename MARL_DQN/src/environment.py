@@ -137,7 +137,10 @@ class Procurement:
                     order_size = 0
             else:
                 # I[self.item_id]["LOT_SIZE_ORDER"] = ORDER_QTY
-                order_size = I[self.item_id]["LOT_SIZE_ORDER"]
+                if inventory.on_hand_inventory + inventory.in_transition_inventory < INVEN_LEVEL_MAX:
+                    order_size = I[self.item_id]["LOT_SIZE_ORDER"]
+                else:
+                    order_size = 0
             if order_size > 0:
                 daily_events.append(
                     f"{present_daytime(self.env.now)}: The Procurement ordered {I[self.item_id]['NAME']}: {order_size}  units  ")

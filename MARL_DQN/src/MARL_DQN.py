@@ -76,7 +76,7 @@ class MultiAgentDQN:
         lr (float): Learning rate
         gamma (float): Discount factor
     """
-    def __init__(self, buffer, n_agents, state_dim, action_dim, lr=1e-3, t_target_interval=5000, gamma=0.99):
+    def __init__(self, buffer, n_agents, state_dim, action_dim, lr=1e-3, t_target_interval=1000, gamma=0.99):
         self.buffer = buffer
         self.n_agents = n_agents
         self.state_dim = state_dim
