@@ -195,7 +195,8 @@ LEADTIME_SCENARIO = {"Dist_Type": "UNIFORM",
 """
 DEMAND_SCENARIO = {"Dist_Type": "GAUSSIAN",
                     "mean": 11.5, 
-                    "std": 2}
+                    "std": 2,
+                    "max": 20}
  
 LEADTIME_SCENARIO = {"Dist_Type": "GAUSSIAN",
                      "mean": 3,
